@@ -493,7 +493,7 @@ $("lightbox").addEventListener("keydown", ev => {
 const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 let found = [], act = -1;
 const q = $("q"), res = $("res");
-function closeRes(){ res.hidden = true; q.setAttribute("aria-expanded","false"); act = -1; document.body.style.overflow=""; }
+function closeRes(){ res.hidden = true; q.setAttribute("aria-expanded","false"); act = -1; }
 function renderRes(){
   const t = norm(q.value.trim());
   found = STATE.events.filter(e => !t || norm(e.title+" "+e.category+" "+e.synopsis).includes(t)).sort(byDate);
@@ -501,7 +501,6 @@ function renderRes(){
     ? found.map((e,i)=>`<li role="option" data-i="${i}" aria-selected="${i===act}"><span>${esc(e.title)}</span><small>${new Date(e.date+"T12:00").toLocaleDateString("es-AR",{day:"numeric",month:"short",year:"numeric"})}${isPast(e)?" (realizado)":""}</small></li>`).join("")
     : `<li class="none">No hay eventos que coincidan</li>`;
   res.hidden = false; q.setAttribute("aria-expanded","true");
-  if(window.matchMedia("(max-width:700px)").matches) document.body.style.overflow="hidden";
 }
 function pick(e){ hl = e.date; view = new Date(e.date+"T12:00"); view.setDate(1); q.value = e.title; closeRes(); renderCal(); $("calendario").scrollIntoView(); openDay(e.date, e.id); }
 q.addEventListener("input", () => { act = -1; renderRes(); });
