@@ -51,7 +51,7 @@ nav a{color:var(--muted);font-size:.9375rem;font-weight:600;text-transform:upper
 .hero .btn.light{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
 .search{position:relative;flex:1 1 300px;max-width:520px}
 .search input{width:100%;height:44px;font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:0 14px}
-.search ul{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;margin:0;padding:4px;list-style:none;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);max-height:280px;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.search ul{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;margin:0;padding:4px;list-style:none;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);max-height:min(280px,60vh);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .search li{padding:8px 10px;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;gap:12px;align-items:baseline}
 .search li small{color:var(--muted);white-space:nowrap}
 .search li[aria-selected="true"],.search li:hover{background:var(--surface-2)}
@@ -493,7 +493,7 @@ $("lightbox").addEventListener("keydown", ev => {
 const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 let found = [], act = -1;
 const q = $("q"), res = $("res");
-function closeRes(){ res.hidden = true; q.setAttribute("aria-expanded","false"); act = -1; }
+function closeRes(){ res.hidden = true; q.setAttribute("aria-expanded","false"); act = -1; document.body.style.overflow=""; }
 function renderRes(){
   const t = norm(q.value.trim());
   found = STATE.events.filter(e => !t || norm(e.title+" "+e.category+" "+e.synopsis).includes(t)).sort(byDate);
@@ -501,6 +501,7 @@ function renderRes(){
     ? found.map((e,i)=>`<li role="option" data-i="${i}" aria-selected="${i===act}"><span>${esc(e.title)}</span><small>${new Date(e.date+"T12:00").toLocaleDateString("es-AR",{day:"numeric",month:"short",year:"numeric"})}${isPast(e)?" (realizado)":""}</small></li>`).join("")
     : `<li class="none">No hay eventos que coincidan</li>`;
   res.hidden = false; q.setAttribute("aria-expanded","true");
+  if(window.matchMedia("(max-width:700px)").matches) document.body.style.overflow="hidden";
 }
 function pick(e){ hl = e.date; view = new Date(e.date+"T12:00"); view.setDate(1); q.value = e.title; closeRes(); renderCal(); $("calendario").scrollIntoView(); openDay(e.date, e.id); }
 q.addEventListener("input", () => { act = -1; renderRes(); });
