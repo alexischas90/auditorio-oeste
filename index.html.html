@@ -369,15 +369,21 @@ function eventToRow(e){
 }
 
 let STATE = { events: [], visita: [] };
+function fmtErr(err){ return err ? (err.message || err.error_description || err.details || JSON.stringify(err)) : ""; }
 async function loadAll(){
   const [{data:evRows,error:e1},{data:viRows,error:e2}] = await Promise.all([
     sb.from("events").select("*"),
     sb.from("visita_info").select("*").order("id")
   ]);
-  if(e1) console.error("Error cargando eventos:", e1);
-  if(e2) console.error("Error cargando visita:", e2);
+  if(e1 || e2){
+    const msg = "No se pudo conectar con la base de datos. " + (fmtErr(e1) || fmtErr(e2));
+    $("upcoming").innerHTML = `<p class="sub" style="color:var(--accent)">${esc(msg)}</p>`;
+    $("past").innerHTML = "";
+    console.error("Error cargando eventos:", e1); console.error("Error cargando visita:", e2);
+    return;
+  }
   STATE.events = (evRows||[]).map(rowToEvent);
-  STATE.visita = (viRows||[]).map(r => ({id:r.id, title:r.title, text:r.text}));
+  STATE.visita = (viRows||[]).map(r => ({id:r.id, title:r.title, text:r.text, image:r.image_url||""}));
 }
 
 const today = iso(0);
@@ -404,10 +410,11 @@ function renderCards(){
 }
 function renderVisita(){
   $("visitaCards").innerHTML = STATE.visita.map((v,i)=>`<button class="card" type="button" data-i="${i}">
-    <div class="thumb info-thumb">Imagen</div><div class="body"><h3>${esc(v.title)}</h3><p>Ver más</p></div></button>`).join("");
+    <div class="thumb info-thumb">${v.image ? `<img src="${esc(v.image)}" alt="">` : "Imagen"}</div><div class="body"><h3>${esc(v.title)}</h3><p>Ver más</p></div></button>`).join("");
   document.querySelectorAll("#visitaCards .card").forEach(b => b.onclick = () => {
     const v = STATE.visita[b.dataset.i];
-    $("idlgBody").innerHTML = `<button class="close" type="button" id="ix" aria-label="Cerrar">&times;</button><h3>${esc(v.title)}</h3><p style="white-space:pre-wrap">${esc(v.text)}</p>`;
+    const img = v.image ? `<img src="${esc(v.image)}" alt="" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:6px;margin-bottom:12px">` : "";
+    $("idlgBody").innerHTML = `<button class="close" type="button" id="ix" aria-label="Cerrar">&times;</button>${img}<h3>${esc(v.title)}</h3><p style="white-space:pre-wrap">${esc(v.text)}</p>`;
     $("ix").onclick = () => $("idlg").close();
     $("idlg").showModal();
   });
@@ -674,19 +681,46 @@ function openForm(ev){
 }
 $("a-new").onclick = () => openForm(blankEvent());
 
+function renderViThumb(i){
+  const v = STATE.visita[i];
+  $(`vi-thumb-${i}`).innerHTML = v.image
+    ? `<img src="${esc(v.image)}"><button class="iconbtn danger" type="button" id="vi-rm-${i}">×</button>`
+    : `<div class="ph" style="aspect-ratio:4/3">Sin imagen</div>`;
+  if(v.image) $(`vi-rm-${i}`).onclick = () => { STATE.visita[i].image = ""; renderViThumb(i); };
+}
 function renderVisitaForm(){
   $("a-visita-form").innerHTML = STATE.visita.map((v,i)=>`
     <div class="aform">
       <div class="full"><label>Título</label><input data-vi="${i}" data-f="title" value="${esc(v.title)}"></div>
       <div class="full"><label>Texto</label><textarea data-vi="${i}" data-f="text" rows="3">${esc(v.text)}</textarea></div>
+      <div class="full"><label>Imagen</label>
+        <div class="thumbmini" style="max-width:220px;margin-bottom:8px" id="vi-thumb-${i}"></div>
+        <input type="file" accept="image/*" id="vi-img-${i}">
+        <p class="note" id="vi-status-${i}"></p>
+      </div>
     </div>`).join("");
+  STATE.visita.forEach((v,i) => {
+    renderViThumb(i);
+    $(`vi-img-${i}`).onchange = async () => {
+      const f = $(`vi-img-${i}`).files[0]; if(!f) return;
+      const status = $(`vi-status-${i}`);
+      status.innerHTML = `<span class="spin"></span> Subiendo...`;
+      try{
+        const blob = await resizeImageBlob(f, 1000);
+        const url = await uploadToBucket("photos", f, blob);
+        STATE.visita[i].image = url;
+        renderViThumb(i);
+        status.textContent = "Listo. No olvides tocar \"Guardar visita\".";
+      }catch(err){ status.textContent = "No se pudo subir: " + err.message; }
+    };
+  });
 }
 $("a-visita-save").onclick = async () => {
   const btn = $("a-visita-save"); btn.disabled = true; btn.textContent = "Guardando...";
   document.querySelectorAll("#a-visita-form [data-vi]").forEach(el => { STATE.visita[+el.dataset.vi][el.dataset.f] = el.value; });
   try{
     for(const v of STATE.visita){
-      const { error } = await sb.from("visita_info").update({title:v.title, text:v.text}).eq("id", v.id);
+      const { error } = await sb.from("visita_info").update({title:v.title, text:v.text, image_url:v.image||null}).eq("id", v.id);
       if(error) throw error;
     }
     renderVisita(); setSaveMsg("Visita guardada.");
@@ -725,7 +759,7 @@ $("a-enter").onclick = async () => {
   $("a-err").textContent = ""; $("a-enter").disabled = true; $("a-enter").textContent = "Entrando...";
   const { error } = await sb.auth.signInWithPassword({ email: $("a-email").value.trim(), password: $("a-pass").value });
   $("a-enter").disabled = false; $("a-enter").textContent = "Entrar";
-  if(error){ $("a-err").textContent = "No se pudo entrar: revisá el email y la contraseña."; return; }
+  if(error){ $("a-err").textContent = "No se pudo entrar: " + (error.message || "revisá el email y la contraseña."); return; }
   $("a-gate").style.display = "none"; $("a-panel-wrap").style.display = "";
   renderList(); renderVisitaForm();
 };
