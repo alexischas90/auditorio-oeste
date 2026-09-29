@@ -39,6 +39,7 @@ nav a{color:var(--muted);font-size:.9375rem;font-weight:600;text-transform:upper
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
 .btn:hover{border-color:var(--accent-2)}
 .btn svg{width:18px;height:18px;flex:none}
+.btn:disabled{opacity:.6;cursor:default}
 
 /* Hero */
 .hero{position:relative;background:radial-gradient(120% 140% at 15% 15%, rgba(255,106,61,.35), transparent 55%),radial-gradient(100% 120% at 85% 85%, rgba(69,216,196,.18), transparent 55%),#000;color:#fff;padding:56px 0;overflow:hidden;border-bottom:1px solid var(--border)}
@@ -134,7 +135,7 @@ video{width:100%;border-radius:6px;background:#000;margin-bottom:8px}
 .buy:hover{filter:brightness(1.08)}
 .buy svg{width:18px;height:18px}
 
-/* ===== Panel de administración (ruta oculta por hash + contraseña) ===== */
+/* ===== Panel de administración (ruta oculta + login real de Supabase) ===== */
 #admin{display:none;min-height:100vh;background:var(--bg)}
 #admin.open{display:block}
 #site.hidden{display:none}
@@ -154,7 +155,7 @@ video{width:100%;border-radius:6px;background:#000;margin-bottom:8px}
 .aform label{display:block;font-size:.8125rem;color:var(--muted);margin-bottom:3px}
 .aform input,.aform select,.aform textarea{width:100%;font:inherit;color:var(--text);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:8px}
 .aform .full{grid-column:1/-1}
-.aactions{display:flex;gap:8px;margin:10px 0 20px}
+.aactions{display:flex;gap:8px;margin:10px 0 20px;align-items:center}
 .iconbtn{background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 12px;font-size:.8125rem;font-weight:700}
 .iconbtn:hover{border-color:var(--accent-2)}
 .iconbtn.danger:hover{border-color:var(--accent);color:var(--accent)}
@@ -163,13 +164,12 @@ video{width:100%;border-radius:6px;background:#000;margin-bottom:8px}
 .thumbmini button{position:absolute;top:4px;right:4px}
 .gatewrap{min-height:100vh;display:grid;place-items:center;padding:24px}
 .gatebox{width:min(360px,100%);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;text-align:center}
-.gatebox input{width:100%;font:inherit;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;margin:12px 0}
+.gatebox input{width:100%;font:inherit;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;margin:6px 0}
 .gate-err{color:var(--accent);font-size:.8125rem;min-height:1.2em}
-#a-export{width:100%;min-height:260px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;font-family:monospace;font-size:.8125rem}
-#a-import{width:100%;min-height:140px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;font-family:monospace;font-size:.8125rem}
-.import-msg{font-size:.8125rem;min-height:1.2em}
-.import-msg.err{color:var(--accent)} .import-msg.ok{color:var(--accent-2)}
+#a-export{width:100%;min-height:220px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;font-family:monospace;font-size:.8125rem}
 .save-state{font-size:.8125rem;color:var(--accent-2);min-height:1.2em}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
 
 @media (max-width:700px){
   nav{display:none}
@@ -228,7 +228,7 @@ video{width:100%;border-radius:6px;background:#000;margin-bottom:8px}
 
   <section id="eventos"><div class="wrap">
     <h2>Próximos eventos</h2><p class="sub">Lo que viene en cartelera</p>
-    <div class="cards" id="upcoming"></div>
+    <div class="cards" id="upcoming"><p class="sub">Cargando…</p></div>
   </div></section>
 
   <section id="calendario"><div class="wrap">
@@ -246,7 +246,7 @@ video{width:100%;border-radius:6px;background:#000;margin-bottom:8px}
 
   <section id="realizados"><div class="wrap">
     <h2>Eventos realizados</h2><p class="sub">Fotos y videos de lo que ya pasó</p>
-    <div class="cards" id="past"></div>
+    <div class="cards" id="past"><p class="sub">Cargando…</p></div>
   </div></section>
 
   <section id="visita"><div class="wrap">
@@ -279,13 +279,11 @@ video{width:100%;border-radius:6px;background:#000;margin-bottom:8px}
 <!-- ============ PANEL DE ADMINISTRACIÓN ============
      No hay ningún botón ni enlace visible hacia acá. Se entra escribiendo
      la ruta secreta al final de la URL: #ADMIN_ROUTE (ver constante abajo).
-     Pide una contraseña simple antes de mostrar nada. IMPORTANTE: como este
-     sitio todavía no tiene servidor propio, esto es una traba para visitas
-     casuales, no una seguridad real (cualquiera que vea el código fuente
-     puede leer la contraseña). Cuando armes el backend, esto se reemplaza
-     por un login de verdad. Los datos que edites acá se guardan en el
-     almacenamiento local de ESTE navegador: para que los vea todo el
-     público hay que llevarlos al backend (por eso existe "Exportar"). ==== -->
+     El login es real: pide el email y la contraseña del usuario que creaste
+     en Supabase (Authentication > Users). Nadie se puede registrar solo:
+     los usuarios se crean a mano desde el panel de Supabase. Los eventos,
+     fotos y videos que cargues acá quedan en la base de datos real, así que
+     los ve cualquiera que entre al sitio, no solo vos. ==== -->
 <div id="admin">
   <div class="gatewrap" id="a-gate">
     <div class="gatebox">
@@ -295,7 +293,8 @@ video{width:100%;border-radius:6px;background:#000;margin-bottom:8px}
       </svg>
       <h3 style="margin:0 0 4px">Panel de gestión</h3>
       <p class="sub" style="margin:0">Auditorio Oeste</p>
-      <input id="a-pass" type="password" placeholder="Contraseña" autocomplete="off">
+      <input id="a-email" type="email" placeholder="Email" autocomplete="username">
+      <input id="a-pass" type="password" placeholder="Contraseña" autocomplete="current-password">
       <button class="btn primary" id="a-enter" type="button" style="width:100%;justify-content:center">Entrar</button>
       <p class="gate-err" id="a-err"></p>
     </div>
@@ -330,15 +329,9 @@ video{width:100%;border-radius:6px;background:#000;margin-bottom:8px}
       </div>
 
       <div class="a-panel" id="tab-ex">
-        <p class="sub">Copiá este JSON y guardalo aparte (en un archivo de texto, un mail a vos mismo, donde quieras) cada vez que vayas a reemplazar este archivo HTML por una versión nueva.</p>
+        <p class="sub">Copia de seguridad de lo que hay ahora mismo en la base de datos. Útil para guardar aparte de tanto en tanto.</p>
         <textarea id="a-export" readonly></textarea>
         <div class="aactions"><button class="btn primary" type="button" id="a-copy">Copiar</button></div>
-
-        <h3 style="margin-top:28px">Importar datos</h3>
-        <p class="sub">Si abriste un archivo nuevo y perdiste lo que habías cargado: pegá acá el JSON que habías copiado antes y tocá Importar. Esto reemplaza todo lo que hay ahora en este navegador por lo que pegues.</p>
-        <textarea id="a-import" placeholder="Pegá acá el JSON exportado..."></textarea>
-        <div class="aactions"><button class="btn primary" type="button" id="a-import-btn">Importar</button></div>
-        <p class="import-msg" id="a-import-msg"></p>
       </div>
 
       <p class="save-state" id="a-save-state"></p>
@@ -347,51 +340,45 @@ video{width:100%;border-radius:6px;background:#000;margin-bottom:8px}
 </div>
 <!-- ============ /PANEL DE ADMINISTRACIÓN ============ -->
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ============ Config: cambiar acá la ruta secreta y la contraseña ============ */
-const ADMIN_ROUTE = "gestion-ao";      // entrar con: tuarchivo.html#gestion-ao
-const ADMIN_PASSWORD = "La211211";     // cambiala por la tuya
+/* ============ Config ============ */
+const ADMIN_ROUTE = "gestion-ao";      // entrar con: tusitio.com#gestion-ao
+const SUPABASE_URL = "https://crhcxokvnwrebpoebnwl.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_EaQDgGQC34qkcrythqnInw_Fb3qVY6A";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const iso = off => { const d = new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()+off); return d.toISOString().slice(0,10); };
-const uid = () => Date.now() + Math.random().toString(16).slice(2,7);
 
-/* ============ Datos: por defecto de ejemplo; si hay algo guardado en este
-   navegador (porque usaste el panel), eso tiene prioridad. ============ */
-const DEFAULT_EVENTS = [
-  { id:"1", title:"Concierto de Jazz Oeste", date:iso(-12), time:"21:00", category:"Música", status:"Disponible",
-    synopsis:"Una noche de jazz con cuarteto en vivo y repertorio de standards y composiciones propias.",
-    info:{ Lugar:"Sala principal", Duración:"90 min", Entrada:"$8.000", Edad:"Todo público" }, photos:[], videos:[] },
-  { id:"2", title:"Obra: El último tren", date:iso(-4), time:"20:30", category:"Teatro", status:"Disponible",
-    synopsis:"Comedia dramática en dos actos sobre un grupo de viajeros varados en una estación.",
-    info:{ Lugar:"Sala principal", Duración:"105 min", Entrada:"$10.000", Edad:"+13" }, photos:[], videos:[] },
-  { id:"3", title:"Festival de Bandas Locales", date:iso(6), time:"19:00", category:"Música", status:"Últimas entradas",
-    synopsis:"Cinco bandas de la zona oeste en una misma noche. Puertas abiertas desde las 18:30.",
-    info:{ Lugar:"Sala principal", Duración:"4 h", Entrada:"$6.000", Edad:"+16" }, photos:[], videos:[], ticketUrl:"https://www.passline.com/" },
-  { id:"4", title:"Charla: Innovación en la región", date:iso(6), time:"11:00", category:"Charla", status:"Disponible",
-    synopsis:"Panel abierto con emprendedores y referentes locales, seguido de preguntas del público.",
-    info:{ Lugar:"Sala 2", Duración:"2 h", Entrada:"Gratuita, con inscripción", Edad:"Todo público" }, photos:[], videos:[] },
-  { id:"5", title:"Stand-up: Noche de risas", date:iso(19), time:"22:00", category:"Humor", status:"Agotado",
-    synopsis:"Tres comediantes, una hora y media de humor en vivo.",
-    info:{ Lugar:"Sala principal", Duración:"90 min", Entrada:"$9.000", Edad:"+16" }, photos:[], videos:[] }
-];
-const DEFAULT_VISITA = [
-  {title:"Cómo llegar", text:"[Acá va el texto completo: dirección exacta, cómo llegar en auto y en transporte público, y dónde estacionar.]"},
-  {title:"Antes de ir", text:"[Acá van los horarios de apertura de puertas, cómo es el ingreso y las recomendaciones para el día del show.]"},
-  {title:"Accesibilidad", text:"[Acá va el detalle de accesos, servicios y recorridos para todos los espectadores.]"}
-];
-
-const STORAGE_KEY = "ao_admin_data_v1";
-function loadState(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw){ const s = JSON.parse(raw); if(s && s.events) return s; }
-  }catch{}
-  return { events: DEFAULT_EVENTS, visita: DEFAULT_VISITA };
+/* ============ Mapeo entre las filas de Supabase y los objetos que usa la página ============ */
+function rowToEvent(r){
+  return {
+    id:r.id, title:r.title, date:r.date, time:(r.time||"").slice(0,5), category:r.category||"", status:r.status||"Disponible",
+    synopsis:r.synopsis||"", info:{Lugar:r.lugar||"",Duración:r.duracion||"",Entrada:r.entrada||"",Edad:r.edad||""},
+    ticketUrl:r.ticket_url||"", photos:r.photos||[], videos:r.videos||[]
+  };
 }
-function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE)); return true; }catch{ return false; } }
-let STATE = loadState();
+function eventToRow(e){
+  return {
+    title:e.title, date:e.date, time:e.time, category:e.category, status:e.status, synopsis:e.synopsis,
+    lugar:e.info.Lugar, duracion:e.info.Duración, entrada:e.info.Entrada, edad:e.info.Edad,
+    ticket_url:e.ticketUrl||null, photos:e.photos, videos:e.videos
+  };
+}
+
+let STATE = { events: [], visita: [] };
+async function loadAll(){
+  const [{data:evRows,error:e1},{data:viRows,error:e2}] = await Promise.all([
+    sb.from("events").select("*"),
+    sb.from("visita_info").select("*").order("id")
+  ]);
+  if(e1) console.error("Error cargando eventos:", e1);
+  if(e2) console.error("Error cargando visita:", e2);
+  STATE.events = (evRows||[]).map(rowToEvent);
+  STATE.visita = (viRows||[]).map(r => ({id:r.id, title:r.title, text:r.text}));
+}
 
 const today = iso(0);
 const isPast = e => e.date < today;
@@ -445,7 +432,8 @@ function renderCal(){
 }
 function openDay(date, id){
   const evs = STATE.events.filter(e=>e.date===date);
-  showEvent(evs, id ? evs.find(e=>e.id===id) : evs[0]);
+  if(!evs.length) return;
+  showEvent(evs, id ? evs.find(e=>e.id==id) : evs[0]);
   if(!$("dlg").open) $("dlg").showModal();
 }
 function showEvent(evs, e){
@@ -490,6 +478,7 @@ $("lightbox").addEventListener("keydown", ev => {
   else if(ev.key==="ArrowRight") $("lb-next").click();
 });
 
+/* ---- Buscador ---- */
 const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 let found = [], act = -1;
 const q = $("q"), res = $("res");
@@ -529,10 +518,9 @@ $("prev").onclick = () => { view.setMonth(view.getMonth()-1); renderCal(); };
 $("nxt").onclick = () => { view.setMonth(view.getMonth()+1); renderCal(); };
 
 function renderPublic(){ renderCards(); renderCal(); renderVisita(); }
-renderPublic();
 
 /* ============ PANEL DE ADMINISTRACIÓN ============ */
-function resizeImage(file, maxW){
+function resizeImageBlob(file, maxW){
   return new Promise((resolve, reject) => {
     const img = new Image(), r = new FileReader();
     r.onload = () => { img.onload = () => {
@@ -540,15 +528,22 @@ function resizeImage(file, maxW){
       const c = document.createElement("canvas");
       c.width = Math.round(img.width*scale); c.height = Math.round(img.height*scale);
       c.getContext("2d").drawImage(img,0,0,c.width,c.height);
-      resolve(c.toDataURL("image/jpeg", .82));
+      c.toBlob(b => b ? resolve(b) : reject(new Error("toBlob falló")), "image/jpeg", .82);
     }; img.onerror = reject; img.src = r.result; };
     r.onerror = reject; r.readAsDataURL(file);
   });
 }
-function blankEvent(){ return {id:uid(), title:"", date:iso(1), time:"20:00", category:"", status:"Disponible", synopsis:"", info:{Lugar:"Sala principal",Duración:"",Entrada:"",Edad:""}, photos:[], videos:[]}; }
+async function uploadToBucket(bucket, file, blob){
+  const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+  const path = `${Date.now()}-${Math.random().toString(16).slice(2,8)}.${blob ? "jpg" : ext}`;
+  const { error } = await sb.storage.from(bucket).upload(path, blob || file, { contentType: blob ? "image/jpeg" : (file.type||undefined) });
+  if(error) throw error;
+  const { data } = sb.storage.from(bucket).getPublicUrl(path);
+  return data.publicUrl;
+}
+function blankEvent(){ return {id:null, title:"", date:iso(1), time:"20:00", category:"", status:"Disponible", synopsis:"", info:{Lugar:"Sala principal",Duración:"",Entrada:"",Edad:""}, ticketUrl:"", photos:[], videos:[]}; }
 
-function setSaveMsg(m){ $("a-save-state").textContent = m || ""; }
-function commit(msg){ const ok = saveState(); renderPublic(); setSaveMsg(ok ? (msg||"Guardado en este navegador.") : "No se pudo guardar: el navegador rechazó el almacenamiento local."); }
+function setSaveMsg(m, isErr){ const el = $("a-save-state"); el.textContent = m || ""; el.style.color = isErr ? "var(--accent)" : "var(--accent-2)"; }
 
 function renderList(){
   const rows = [...STATE.events].sort(byDate).map(e => `
@@ -560,16 +555,19 @@ function renderList(){
       </div>
     </div>`).join("");
   $("a-list").innerHTML = rows || `<p class="sub">Todavía no hay eventos.</p>`;
-  document.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => openForm(STATE.events.find(x=>x.id===b.dataset.edit)));
-  document.querySelectorAll("[data-del]").forEach(b => b.onclick = () => {
+  document.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => openForm({...STATE.events.find(x=>x.id==b.dataset.edit)}));
+  document.querySelectorAll("[data-del]").forEach(b => b.onclick = async () => {
     if(!confirm("¿Eliminar este evento? No se puede deshacer.")) return;
-    STATE.events = STATE.events.filter(x=>x.id!==b.dataset.del);
-    commit("Evento eliminado."); renderList(); closeForm();
+    const { error } = await sb.from("events").delete().eq("id", b.dataset.del);
+    if(error){ setSaveMsg("No se pudo eliminar: " + error.message, true); return; }
+    STATE.events = STATE.events.filter(x=>x.id!=b.dataset.del);
+    renderPublic(); renderList(); closeForm();
+    setSaveMsg("Evento eliminado.");
   });
 }
 function closeForm(){ $("a-form-slot").innerHTML = ""; }
 function openForm(ev){
-  const editingExisting = STATE.events.some(x=>x.id===ev.id);
+  const editingExisting = ev.id != null;
   $("a-form-slot").innerHTML = `
     <div class="aform">
       <h3 class="full" style="margin:0">${editingExisting?"Editar evento":"Nuevo evento"}</h3>
@@ -593,16 +591,16 @@ function openForm(ev){
       <div class="full"><label>Fotos</label>
         <div class="cards" id="f-photos" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr));margin-bottom:8px"></div>
         <input id="f-addphoto" type="file" accept="image/*">
-        <p class="note">Se guardan en este navegador, comprimidas. Para muchas fotos de alta calidad, mejor un backend con almacenamiento real.</p>
+        <p class="note" id="f-photo-status">Se suben a Supabase Storage y quedan visibles para todos.</p>
       </div>
 
       <div class="full"><label>Videos ${isPast(ev)?"":"(se cargan cuando el evento ya pasó)"}</label>
         ${isPast(ev) ? `
         <div id="f-videos" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
-        <input id="f-addvideourl" placeholder="Pegar URL de un video ya subido (YouTube, Vimeo, o archivo .mp4)">
-        <p class="note" style="margin-bottom:8px">Recomendado: subí el video a YouTube/Vimeo (aunque sea no listado) y pegá el link acá — así no depende de este navegador.</p>
+        <input id="f-addvideourl" placeholder="Pegar URL de un video (YouTube, Vimeo, o archivo .mp4) y Enter">
+        <p class="note" style="margin-bottom:8px">Recomendado para videos largos: subilo a YouTube/Vimeo (aunque sea no listado) y pegá el link acá.</p>
         <input id="f-addvideofile" type="file" accept="video/*">
-        <p class="note">Alternativa rápida: elegir un archivo de video acá lo muestra solo en esta sesión (no queda guardado al recargar).</p>
+        <p class="note" id="f-video-status">Alternativa: subir el archivo directo (ideal para clips cortos; los videos pesan, cuidá el espacio del plan gratuito).</p>
         ` : `<p class="note">Guardá el evento con una fecha pasada para poder subir fotos y videos del show.</p>`}
       </div>
 
@@ -625,23 +623,53 @@ function openForm(ev){
 
   $("f-addphoto").onchange = async () => {
     const f = $("f-addphoto").files[0]; if(!f) return;
-    try{ ev.photos.push(await resizeImage(f, 1000)); renderPhotos(); $("f-addphoto").value=""; }
-    catch{ alert("No se pudo procesar la imagen."); }
+    const st = $("f-photo-status"); const prev = st.textContent;
+    st.innerHTML = `<span class="spin"></span> Subiendo foto...`;
+    try{
+      const blob = await resizeImageBlob(f, 1000);
+      const url = await uploadToBucket("photos", f, blob);
+      ev.photos.push(url); renderPhotos(); $("f-addphoto").value = ""; st.textContent = "Listo.";
+    }catch(err){ st.textContent = "No se pudo subir: " + err.message; }
+    setTimeout(()=>{ if(st) st.textContent = prev; }, 2500);
   };
   const avu = $("f-addvideourl");
-  if(avu) avu.addEventListener("keydown", e => { if(e.key==="Enter" && avu.value.trim()){ ev.videos.push(avu.value.trim()); avu.value=""; renderVideos(); } });
+  if(avu) avu.addEventListener("keydown", e => { if(e.key==="Enter" && avu.value.trim()){ e.preventDefault(); ev.videos.push(avu.value.trim()); avu.value=""; renderVideos(); } });
   const avf = $("f-addvideofile");
-  if(avf) avf.onchange = () => { const f = avf.files[0]; if(!f) return; ev.videos.push(URL.createObjectURL(f)); avf.value=""; renderVideos(); };
+  if(avf) avf.onchange = async () => {
+    const f = avf.files[0]; if(!f) return;
+    const st = $("f-video-status"); const prev = st.textContent;
+    st.innerHTML = `<span class="spin"></span> Subiendo video, puede tardar...`;
+    try{ const url = await uploadToBucket("videos", f); ev.videos.push(url); renderVideos(); avf.value=""; st.textContent = "Listo."; }
+    catch(err){ st.textContent = "No se pudo subir: " + err.message; }
+    setTimeout(()=>{ if(st) st.textContent = prev; }, 2500);
+  };
 
   $("f-cancel").onclick = closeForm;
-  $("f-save").onclick = () => {
+  $("f-save").onclick = async () => {
     ev.title = $("f-title").value.trim(); ev.date = $("f-date").value; ev.time = $("f-time").value; ev.category = $("f-cat").value.trim();
     ev.status = $("f-status").value; ev.synopsis = $("f-syn").value.trim();
     ev.info = {Lugar:$("f-lugar").value.trim(), Duración:$("f-dur").value.trim(), Entrada:$("f-ent").value.trim(), Edad:$("f-edad").value.trim()};
     ev.ticketUrl = $("f-ticket").value.trim();
-    if(!ev.title || !ev.date){ setSaveMsg("Completá al menos título y fecha."); return; }
-    if(!editingExisting) STATE.events.push(ev);
-    commit("Evento guardado."); renderList(); closeForm();
+    if(!ev.title || !ev.date){ setSaveMsg("Completá al menos título y fecha.", true); return; }
+    $("f-save").disabled = true; $("f-save").textContent = "Guardando...";
+    try{
+      const row = eventToRow(ev);
+      if(!editingExisting){
+        const { data, error } = await sb.from("events").insert(row).select().single();
+        if(error) throw error;
+        STATE.events.push(rowToEvent(data));
+      } else {
+        const { error } = await sb.from("events").update(row).eq("id", ev.id);
+        if(error) throw error;
+        const idx = STATE.events.findIndex(x=>x.id===ev.id);
+        STATE.events[idx] = {...ev};
+      }
+      renderPublic(); renderList(); closeForm();
+      setSaveMsg("Evento guardado.");
+    }catch(err){
+      setSaveMsg("No se pudo guardar: " + err.message, true);
+      $("f-save").disabled = false; $("f-save").textContent = "Guardar evento";
+    }
   };
 }
 $("a-new").onclick = () => openForm(blankEvent());
@@ -653,30 +681,23 @@ function renderVisitaForm(){
       <div class="full"><label>Texto</label><textarea data-vi="${i}" data-f="text" rows="3">${esc(v.text)}</textarea></div>
     </div>`).join("");
 }
-$("a-visita-save").onclick = () => {
+$("a-visita-save").onclick = async () => {
+  const btn = $("a-visita-save"); btn.disabled = true; btn.textContent = "Guardando...";
   document.querySelectorAll("#a-visita-form [data-vi]").forEach(el => { STATE.visita[+el.dataset.vi][el.dataset.f] = el.value; });
-  commit("Visita guardada."); renderVisitaForm();
+  try{
+    for(const v of STATE.visita){
+      const { error } = await sb.from("visita_info").update({title:v.title, text:v.text}).eq("id", v.id);
+      if(error) throw error;
+    }
+    renderVisita(); setSaveMsg("Visita guardada.");
+  }catch(err){ setSaveMsg("No se pudo guardar: " + err.message, true); }
+  btn.disabled = false; btn.textContent = "Guardar visita";
 };
 
 function renderExport(){ $("a-export").value = JSON.stringify(STATE, null, 2); }
 $("a-copy").onclick = async () => {
   try{ await navigator.clipboard.writeText($("a-export").value); setSaveMsg("Copiado al portapapeles."); }
   catch{ $("a-export").select(); setSaveMsg("Seleccioná y copiá manualmente (Ctrl/Cmd+C)."); }
-};
-$("a-import-btn").onclick = () => {
-  const msg = $("a-import-msg");
-  let parsed;
-  try{ parsed = JSON.parse($("a-import").value); }
-  catch{ msg.className = "import-msg err"; msg.textContent = "Eso no es un JSON válido. Revisá que hayas pegado todo, sin cortar."; return; }
-  if(!parsed || !Array.isArray(parsed.events) || !Array.isArray(parsed.visita)){
-    msg.className = "import-msg err"; msg.textContent = "El JSON no tiene el formato esperado (falta 'events' o 'visita')."; return;
-  }
-  STATE = parsed;
-  const ok = saveState();
-  renderPublic(); renderList(); renderVisitaForm(); renderExport();
-  msg.className = "import-msg " + (ok ? "ok" : "err");
-  msg.textContent = ok ? `Importado: ${STATE.events.length} eventos y ${STATE.visita.length} textos de visita.` : "Se importó en memoria pero no se pudo guardar en este navegador.";
-  $("a-import").value = "";
 };
 
 document.querySelectorAll(".a-tabs button").forEach(b => b.onclick = () => {
@@ -687,29 +708,36 @@ document.querySelectorAll(".a-tabs button").forEach(b => b.onclick = () => {
   if(b.dataset.tab==="ex") renderExport();
 });
 
-/* ---- Acceso: ruta oculta + contraseña ---- */
+/* ---- Acceso: ruta oculta + login real de Supabase ---- */
 function inAdminRoute(){ return location.hash.replace("#","") === ADMIN_ROUTE; }
-function showAdmin(){
+async function showAdmin(){
   $("site").classList.add("hidden"); $("admin").classList.add("open");
-  const already = sessionStorage.getItem("ao_admin_ok") === "1";
-  $("a-gate").style.display = already ? "none" : "";
-  $("a-panel-wrap").style.display = already ? "" : "none";
-  if(already){ renderList(); renderVisitaForm(); }
+  const { data:{ session } } = await sb.auth.getSession();
+  $("a-gate").style.display = session ? "none" : "";
+  $("a-panel-wrap").style.display = session ? "" : "none";
+  if(session){ renderList(); renderVisitaForm(); }
 }
 function hideAdmin(){ $("site").classList.remove("hidden"); $("admin").classList.remove("open"); }
-function routeCheck(){ if(inAdminRoute()) showAdmin(); else hideAdmin(); }
+async function routeCheck(){ if(inAdminRoute()) await showAdmin(); else hideAdmin(); }
 window.addEventListener("hashchange", routeCheck);
-routeCheck();
 
-$("a-enter").onclick = () => {
-  if($("a-pass").value === ADMIN_PASSWORD){
-    sessionStorage.setItem("ao_admin_ok","1");
-    $("a-gate").style.display = "none"; $("a-panel-wrap").style.display = "";
-    renderList(); renderVisitaForm();
-  } else { $("a-err").textContent = "Contraseña incorrecta."; }
+$("a-enter").onclick = async () => {
+  $("a-err").textContent = ""; $("a-enter").disabled = true; $("a-enter").textContent = "Entrando...";
+  const { error } = await sb.auth.signInWithPassword({ email: $("a-email").value.trim(), password: $("a-pass").value });
+  $("a-enter").disabled = false; $("a-enter").textContent = "Entrar";
+  if(error){ $("a-err").textContent = "No se pudo entrar: revisá el email y la contraseña."; return; }
+  $("a-gate").style.display = "none"; $("a-panel-wrap").style.display = "";
+  renderList(); renderVisitaForm();
 };
 $("a-pass").addEventListener("keydown", e => { if(e.key==="Enter") $("a-enter").click(); });
-$("a-logout").onclick = () => { sessionStorage.removeItem("ao_admin_ok"); location.hash = "inicio"; };
+$("a-logout").onclick = async () => { await sb.auth.signOut(); location.hash = "inicio"; };
+
+/* ============ Arranque ============ */
+(async function boot(){
+  await loadAll();
+  renderPublic();
+  await routeCheck();
+})();
 </script>
 </body>
 </html>
