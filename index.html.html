@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Auditorio Oeste</title>
+<style>
+:root{
+  --bg:#0b0b0c; --surface:#161617; --surface-2:#222224; --text:#f5f5f3; --muted:#9c9c9c;
+  --border:#2c2c2e; --accent:#ff6a3d; --accent-text:#0b0b0c; --accent-2:#45d8c4; --past:#6d6d6f;
+  --radius:10px; --font:'Arial Black',Impact,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:calc(72px + env(safe-area-inset-top,0px))}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+button,a{font:inherit;color:inherit}
+button{cursor:pointer}
+a{text-decoration:none}
+h1,h2,h3,.brand{font-family:var(--font);text-transform:uppercase;letter-spacing:.02em}
+:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+section{padding:32px 0}
+section h2{margin:0 0 4px;font-size:1.5rem}
+.sub{margin:0 0 16px;color:var(--muted)}
+
+/* Header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);border-bottom:1px solid var(--border)}
+header .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.0625rem}
+.logo-mark{width:38px;height:38px;flex:none;display:block}
+.logo-mark polygon{fill:#000;stroke:var(--accent);stroke-width:3;stroke-linejoin:miter}
+.logo-mark text{fill:var(--accent-2);font-family:var(--font);font-size:17px;font-weight:900}
+nav{display:flex;gap:18px;margin-left:12px}
+nav a{color:var(--muted);font-size:.9375rem;font-weight:600;text-transform:uppercase;letter-spacing:.03em} nav a:hover{color:var(--accent-2)}
+.actions{margin-left:auto;display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--text);white-space:nowrap;font-weight:700;text-transform:uppercase;font-size:.8125rem;letter-spacing:.03em}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
+.btn:hover{border-color:var(--accent-2)}
+.btn svg{width:18px;height:18px;flex:none}
+
+/* Hero */
+.hero{position:relative;background:radial-gradient(120% 140% at 15% 15%, rgba(255,106,61,.35), transparent 55%),radial-gradient(100% 120% at 85% 85%, rgba(69,216,196,.18), transparent 55%),#000;color:#fff;padding:56px 0;overflow:hidden;border-bottom:1px solid var(--border)}
+.hero .kicker{display:inline-block;background:var(--accent-2);color:#04211d;font-family:var(--font);font-size:.8125rem;font-weight:900;letter-spacing:.04em;padding:3px 12px;border-radius:4px;margin-bottom:14px;transform:rotate(-2deg)}
+.hero h1{margin:0;font-size:clamp(2.25rem,6vw,3.5rem);line-height:1;font-weight:900}
+.hero .meta{margin:8px 0 12px;color:var(--muted);text-transform:uppercase;font-size:.875rem;letter-spacing:.05em}
+.hero p.lead{max-width:56ch;margin:0 0 24px;color:#d8d8d6}
+.hero-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start}
+.hero .btn{background:transparent;border-color:rgba(255,255,255,.35);color:#fff}
+.hero .btn.light{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+.search{position:relative;flex:1 1 300px;max-width:520px}
+.search input{width:100%;height:44px;font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:0 14px}
+.search ul{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;margin:0;padding:4px;list-style:none;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);max-height:280px;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.search li{padding:8px 10px;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.search li small{color:var(--muted);white-space:nowrap}
+.search li[aria-selected="true"],.search li:hover{background:var(--surface-2)}
+.search li.none{cursor:default;color:var(--muted)}
+
+/* Cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.card{text-align:left;padding:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:border-color .15s,transform .15s;width:100%}
+.card:hover{border-color:var(--accent-2);transform:translateY(-2px)}
+.thumb{aspect-ratio:4/3;background:radial-gradient(140% 100% at 30% 100%, rgba(255,106,61,.35), transparent 60%), var(--surface-2);display:grid;place-items:center;color:var(--muted);font-size:.8125rem;position:relative}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.card .body{padding:12px}
+.card h3{margin:0 0 2px;font-size:1.0625rem;line-height:1.25;text-transform:uppercase;font-weight:800;letter-spacing:.01em}
+.card p{margin:0;color:var(--muted);font-size:.875rem}
+.st{position:absolute;top:8px;left:8px;font-size:.6875rem;font-weight:900;text-transform:uppercase;letter-spacing:.03em;padding:3px 9px;border-radius:4px;background:var(--accent-2);color:#04211d}
+.st.off{background:var(--surface);color:var(--muted);border:1px solid var(--border)}
+.st.past{background:var(--surface);color:var(--past);border:1px solid var(--border)}
+
+/* Calendario */
+.cal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cal-head h3{margin:0;font-size:1.125rem;text-transform:uppercase;font-weight:800}
+.nav{background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius);width:40px;height:40px}
+.nav:hover{border-color:var(--accent-2)}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dow{text-align:center;font-size:.75rem;color:var(--muted);padding:4px 0;text-transform:uppercase}
+.day{min-height:64px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);padding:4px;text-align:left;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.day.empty{border:0;background:none}
+.day.plain{color:var(--muted)}
+.day.today .n{background:var(--accent-2);color:#04211d;font-weight:900;border-radius:50%;width:22px;height:22px;display:inline-grid;place-items:center}
+.day.has{border-color:var(--accent)} .day.has:hover{background:var(--surface-2)} .day.has.past{border-color:var(--past)}
+.day.hl{box-shadow:0 0 0 2px var(--accent-2)}
+.tag{font-size:.6875rem;line-height:1.2;background:var(--accent);color:var(--accent-text);font-weight:700;border-radius:4px;padding:1px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.past .tag{background:var(--past);color:#0b0b0c}
+.legend{display:flex;gap:16px;margin-top:8px;font-size:.8125rem;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;background:var(--accent)}
+.legend i.p{background:var(--past)}
+
+/* Visita: tarjetas clickeables que abren un detalle */
+.info-thumb{background:var(--surface-2)}
+
+footer{background:#000;border-top:1px solid var(--border);margin-top:16px;padding:32px 0 24px}
+.fcols{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px}
+footer h4{margin:0 0 8px;text-transform:uppercase;color:var(--accent-2);font-size:.9375rem;letter-spacing:.03em}
+footer a,footer p{display:block;margin:0 0 4px;color:var(--muted);font-size:.9375rem}
+footer a:hover{color:var(--accent-2)}
+.copy{text-align:center;color:var(--muted);font-size:.8125rem;margin-top:24px}
+
+/* Modal de detalle (eventos e información de visita) */
+dialog{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);padding:0;width:min(640px,calc(100% - 24px));max-height:calc(100% - 24px)}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+.dlg{padding:20px}
+.close{float:right;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius);width:36px;height:36px}
+.close:hover{border-color:var(--accent-2)}
+.badge{display:inline-block;font-size:.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.03em;background:var(--accent-2);color:#04211d;border-radius:4px;padding:2px 10px}
+.badge.past{background:var(--surface-2);color:var(--past);border:1px solid var(--border)}
+.dlg h3{margin:8px 0 4px;font-size:1.75rem;line-height:1.15;text-transform:uppercase;font-weight:900}
+.when{color:var(--muted);margin:0 0 12px}
+.dlg h4{margin:20px 0 6px;font-size:1rem;text-transform:uppercase;color:var(--accent-2);letter-spacing:.03em}
+dl{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;margin:0}
+dt{color:var(--muted)} dd{margin:0}
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.photos button{padding:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:none}
+.photos img,.ph{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--surface-2)}
+.ph{display:grid;place-items:center;color:var(--muted);font-size:.8125rem;border:1px solid var(--border);border-radius:6px}
+#lightbox{border:0;background:rgba(0,0,0,.92);width:100vw;height:100vh;max-width:100vw;max-height:100vh;padding:0}
+#lightbox::backdrop{background:rgba(0,0,0,.92)}
+.lb-wrap{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.lb-wrap img{max-width:92vw;max-height:88vh;object-fit:contain;border-radius:4px}
+.lb-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:99px;width:40px;height:40px}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:99px;width:44px;height:44px;font-size:1.25rem}
+.lb-prev{left:12px} .lb-next{right:12px}
+.lb-count{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);color:#fff;font-size:.8125rem;background:rgba(255,255,255,.1);border-radius:99px;padding:4px 12px}
+video{width:100%;border-radius:6px;background:#000;margin-bottom:8px}
+.note{font-size:.8125rem;color:var(--muted);margin:6px 0 0}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button{background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:99px;padding:2px 12px;font-size:.875rem}
+.tabs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+.buy{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:46px;margin-top:16px;background:var(--accent);color:var(--accent-text);border:none;border-radius:var(--radius);font-weight:900;text-transform:uppercase;letter-spacing:.03em;font-size:.9375rem}
+.buy:hover{filter:brightness(1.08)}
+.buy svg{width:18px;height:18px}
+
+/* ===== Panel de administración (ruta oculta por hash + contraseña) ===== */
+#admin{display:none;min-height:100vh;background:var(--bg)}
+#admin.open{display:block}
+#site.hidden{display:none}
+.a-head{position:sticky;top:0;background:#000;border-bottom:1px solid var(--border);z-index:5}
+.a-head .wrap{display:flex;align-items:center;gap:12px;height:60px}
+.a-head h2{margin:0;font-size:1.0625rem}
+.a-tabs{display:flex;gap:6px;margin-left:24px}
+.a-tabs button{background:none;border:1px solid transparent;color:var(--muted);padding:6px 12px;border-radius:99px;font-size:.8125rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.a-tabs button.on{background:var(--surface-2);border-color:var(--border);color:var(--accent-2)}
+.a-body{padding:24px 0 60px}
+.a-panel{display:none}
+.a-panel.on{display:block}
+.arow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);margin-bottom:8px}
+.arow .ttl{font-weight:700}
+.arow .sm{color:var(--muted);font-size:.8125rem}
+.aform{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.aform label{display:block;font-size:.8125rem;color:var(--muted);margin-bottom:3px}
+.aform input,.aform select,.aform textarea{width:100%;font:inherit;color:var(--text);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:8px}
+.aform .full{grid-column:1/-1}
+.aactions{display:flex;gap:8px;margin:10px 0 20px}
+.iconbtn{background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 12px;font-size:.8125rem;font-weight:700}
+.iconbtn:hover{border-color:var(--accent-2)}
+.iconbtn.danger:hover{border-color:var(--accent);color:var(--accent)}
+.thumbmini{position:relative;width:100%;aspect-ratio:4/3;border-radius:6px;overflow:hidden;background:var(--surface-2);border:1px solid var(--border)}
+.thumbmini img,.thumbmini video{width:100%;height:100%;object-fit:cover}
+.thumbmini button{position:absolute;top:4px;right:4px}
+.gatewrap{min-height:100vh;display:grid;place-items:center;padding:24px}
+.gatebox{width:min(360px,100%);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;text-align:center}
+.gatebox input{width:100%;font:inherit;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;margin:12px 0}
+.gate-err{color:var(--accent);font-size:.8125rem;min-height:1.2em}
+#a-export{width:100%;min-height:260px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;font-family:monospace;font-size:.8125rem}
+#a-import{width:100%;min-height:140px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;font-family:monospace;font-size:.8125rem}
+.import-msg{font-size:.8125rem;min-height:1.2em}
+.import-msg.err{color:var(--accent)} .import-msg.ok{color:var(--accent-2)}
+.save-state{font-size:.8125rem;color:var(--accent-2);min-height:1.2em}
+
+@media (max-width:700px){
+  nav{display:none}
+  .hero h1{font-size:1.75rem}
+  .day{min-height:48px}.tag{display:none}
+  .day.has .n{font-weight:700}
+  .day.has::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:auto}
+  .day.has.past::after{background:var(--past)}
+  .aform{grid-template-columns:1fr}
+  .a-tabs{margin-left:8px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ SITIO PÚBLICO ============ -->
+<div id="site">
+<header>
+  <div class="wrap">
+    <a class="brand" href="#inicio">
+      <svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <polygon points="20,2 25,2 25,7 30,7 30,12 35,12 35,20 35,25 30,25 30,30 25,30 25,35 20,35 15,35 15,30 10,30 10,25 5,25 5,20 5,12 10,12 10,7 15,7 15,2"/>
+        <text x="20" y="26" text-anchor="middle">A</text>
+      </svg>
+      Auditorio Oeste
+    </a>
+    <nav aria-label="Principal">
+      <a href="#inicio">Inicio</a><a href="#eventos">Eventos</a><a href="#calendario">Calendario</a><a href="#visita">Visita</a>
+    </nav>
+    <div class="actions">
+      <a class="btn primary" href="#calendario">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendario</a>
+      <button class="btn" id="hsearch" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Buscar</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="hero" id="inicio">
+    <div class="wrap">
+      <span class="kicker">El oeste suena fuerte</span>
+      <h1>Auditorio Oeste</h1>
+      <p class="meta">Desde Haedo · [Dirección del auditorio]</p>
+      <p class="lead">Conciertos, teatro, charlas y eventos especiales. Buscá tu próximo espectáculo o mirá lo que ya pasó.</p>
+      <div class="hero-row">
+        <div class="search">
+          <input id="q" type="search" placeholder="Buscar evento por nombre o categoría" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="res" aria-label="Buscar evento">
+          <ul id="res" role="listbox" hidden></ul>
+        </div>
+        <a class="btn light" href="#calendario">Ver calendario</a>
+        <a class="btn" href="#eventos">Ver programación</a>
+      </div>
+    </div>
+  </div>
+
+  <section id="eventos"><div class="wrap">
+    <h2>Próximos eventos</h2><p class="sub">Lo que viene en cartelera</p>
+    <div class="cards" id="upcoming"></div>
+  </div></section>
+
+  <section id="calendario"><div class="wrap">
+    <h2>Calendario</h2><p class="sub">Tocá un día marcado para ver el evento</p>
+    <div class="cal">
+      <div class="cal-head">
+        <button class="nav" id="prev" type="button" aria-label="Mes anterior">&lsaquo;</button>
+        <h3 id="title"></h3>
+        <button class="nav" id="nxt" type="button" aria-label="Mes siguiente">&rsaquo;</button>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="legend"><span><i></i>Próximo evento</span><span><i class="p"></i>Evento realizado</span></div>
+    </div>
+  </div></section>
+
+  <section id="realizados"><div class="wrap">
+    <h2>Eventos realizados</h2><p class="sub">Fotos y videos de lo que ya pasó</p>
+    <div class="cards" id="past"></div>
+  </div></section>
+
+  <section id="visita"><div class="wrap">
+    <h2>Planificá tu visita</h2><p class="sub">Tocá una tarjeta para ver el detalle</p>
+    <div class="cards" id="visitaCards"></div>
+  </div></section>
+</main>
+
+<dialog id="dlg" aria-label="Detalle del evento"><div class="dlg" id="dlgBody"></div></dialog>
+<dialog id="idlg" aria-label="Información"><div class="dlg" id="idlgBody"></div></dialog>
+<dialog id="lightbox" aria-label="Foto ampliada"><div class="lb-wrap">
+  <button class="lb-close" type="button" id="lb-close" aria-label="Cerrar">&times;</button>
+  <button class="lb-nav lb-prev" type="button" id="lb-prev" aria-label="Foto anterior">&lsaquo;</button>
+  <img id="lb-img" alt="">
+  <button class="lb-nav lb-next" type="button" id="lb-next" aria-label="Foto siguiente">&rsaquo;</button>
+  <span class="lb-count" id="lb-count"></span>
+</div></dialog>
+
+<footer><div class="wrap">
+  <div class="fcols">
+    <div><h4>Auditorio Oeste</h4><p>Espacio de eventos de la zona oeste.</p></div>
+    <div><h4>Eventos</h4><a href="#eventos">Todos los eventos</a><a href="#calendario">Calendario</a><a href="#realizados">Eventos realizados</a></div>
+    <div><h4>Contacto</h4><p>[Dirección]</p><p>[Email]</p><p>[Redes sociales]</p></div>
+  </div>
+  <p class="copy">© 2026 Auditorio Oeste</p>
+</div></footer>
+</div>
+<!-- ============ /SITIO PÚBLICO ============ -->
+
+<!-- ============ PANEL DE ADMINISTRACIÓN ============
+     No hay ningún botón ni enlace visible hacia acá. Se entra escribiendo
+     la ruta secreta al final de la URL: #ADMIN_ROUTE (ver constante abajo).
+     Pide una contraseña simple antes de mostrar nada. IMPORTANTE: como este
+     sitio todavía no tiene servidor propio, esto es una traba para visitas
+     casuales, no una seguridad real (cualquiera que vea el código fuente
+     puede leer la contraseña). Cuando armes el backend, esto se reemplaza
+     por un login de verdad. Los datos que edites acá se guardan en el
+     almacenamiento local de ESTE navegador: para que los vea todo el
+     público hay que llevarlos al backend (por eso existe "Exportar"). ==== -->
+<div id="admin">
+  <div class="gatewrap" id="a-gate">
+    <div class="gatebox">
+      <svg class="logo-mark" viewBox="0 0 40 40" style="margin:0 auto 12px" aria-hidden="true">
+        <polygon points="20,2 25,2 25,7 30,7 30,12 35,12 35,20 35,25 30,25 30,30 25,30 25,35 20,35 15,35 15,30 10,30 10,25 5,25 5,20 5,12 10,12 10,7 15,7 15,2"/>
+        <text x="20" y="26" text-anchor="middle">A</text>
+      </svg>
+      <h3 style="margin:0 0 4px">Panel de gestión</h3>
+      <p class="sub" style="margin:0">Auditorio Oeste</p>
+      <input id="a-pass" type="password" placeholder="Contraseña" autocomplete="off">
+      <button class="btn primary" id="a-enter" type="button" style="width:100%;justify-content:center">Entrar</button>
+      <p class="gate-err" id="a-err"></p>
+    </div>
+  </div>
+
+  <div id="a-panel-wrap" style="display:none">
+    <div class="a-head"><div class="wrap">
+      <h2>Panel de gestión</h2>
+      <div class="a-tabs">
+        <button type="button" data-tab="ev" class="on">Eventos</button>
+        <button type="button" data-tab="vi">Visita</button>
+        <button type="button" data-tab="ex">Exportar</button>
+      </div>
+      <div class="actions">
+        <a class="btn" href="#inicio">Ver sitio</a>
+        <button class="btn" id="a-logout" type="button">Salir</button>
+      </div>
+    </div></div>
+
+    <div class="a-body"><div class="wrap">
+      <div class="a-panel on" id="tab-ev">
+        <div class="aactions"><button class="btn primary" type="button" id="a-new">+ Nuevo evento</button></div>
+        <div id="a-form-slot"></div>
+        <h3>Todos los eventos</h3>
+        <div id="a-list"></div>
+      </div>
+
+      <div class="a-panel" id="tab-vi">
+        <p class="sub">Este texto es el que ve el público al tocar cada tarjeta de "Planificá tu visita".</p>
+        <div id="a-visita-form"></div>
+        <div class="aactions"><button class="btn primary" type="button" id="a-visita-save">Guardar visita</button></div>
+      </div>
+
+      <div class="a-panel" id="tab-ex">
+        <p class="sub">Copiá este JSON y guardalo aparte (en un archivo de texto, un mail a vos mismo, donde quieras) cada vez que vayas a reemplazar este archivo HTML por una versión nueva.</p>
+        <textarea id="a-export" readonly></textarea>
+        <div class="aactions"><button class="btn primary" type="button" id="a-copy">Copiar</button></div>
+
+        <h3 style="margin-top:28px">Importar datos</h3>
+        <p class="sub">Si abriste un archivo nuevo y perdiste lo que habías cargado: pegá acá el JSON que habías copiado antes y tocá Importar. Esto reemplaza todo lo que hay ahora en este navegador por lo que pegues.</p>
+        <textarea id="a-import" placeholder="Pegá acá el JSON exportado..."></textarea>
+        <div class="aactions"><button class="btn primary" type="button" id="a-import-btn">Importar</button></div>
+        <p class="import-msg" id="a-import-msg"></p>
+      </div>
+
+      <p class="save-state" id="a-save-state"></p>
+    </div></div>
+  </div>
+</div>
+<!-- ============ /PANEL DE ADMINISTRACIÓN ============ -->
+
+<script>
+/* ============ Config: cambiar acá la ruta secreta y la contraseña ============ */
+const ADMIN_ROUTE = "gestion-ao";      // entrar con: tuarchivo.html#gestion-ao
+const ADMIN_PASSWORD = "oeste2026";     // cambiala por la tuya
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const iso = off => { const d = new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()+off); return d.toISOString().slice(0,10); };
+const uid = () => Date.now() + Math.random().toString(16).slice(2,7);
+
+/* ============ Datos: por defecto de ejemplo; si hay algo guardado en este
+   navegador (porque usaste el panel), eso tiene prioridad. ============ */
+const DEFAULT_EVENTS = [
+  { id:"1", title:"Concierto de Jazz Oeste", date:iso(-12), time:"21:00", category:"Música", status:"Disponible",
+    synopsis:"Una noche de jazz con cuarteto en vivo y repertorio de standards y composiciones propias.",
+    info:{ Lugar:"Sala principal", Duración:"90 min", Entrada:"$8.000", Edad:"Todo público" }, photos:[], videos:[] },
+  { id:"2", title:"Obra: El último tren", date:iso(-4), time:"20:30", category:"Teatro", status:"Disponible",
+    synopsis:"Comedia dramática en dos actos sobre un grupo de viajeros varados en una estación.",
+    info:{ Lugar:"Sala principal", Duración:"105 min", Entrada:"$10.000", Edad:"+13" }, photos:[], videos:[] },
+  { id:"3", title:"Festival de Bandas Locales", date:iso(6), time:"19:00", category:"Música", status:"Últimas entradas",
+    synopsis:"Cinco bandas de la zona oeste en una misma noche. Puertas abiertas desde las 18:30.",
+    info:{ Lugar:"Sala principal", Duración:"4 h", Entrada:"$6.000", Edad:"+16" }, photos:[], videos:[], ticketUrl:"https://www.passline.com/" },
+  { id:"4", title:"Charla: Innovación en la región", date:iso(6), time:"11:00", category:"Charla", status:"Disponible",
+    synopsis:"Panel abierto con emprendedores y referentes locales, seguido de preguntas del público.",
+    info:{ Lugar:"Sala 2", Duración:"2 h", Entrada:"Gratuita, con inscripción", Edad:"Todo público" }, photos:[], videos:[] },
+  { id:"5", title:"Stand-up: Noche de risas", date:iso(19), time:"22:00", category:"Humor", status:"Agotado",
+    synopsis:"Tres comediantes, una hora y media de humor en vivo.",
+    info:{ Lugar:"Sala principal", Duración:"90 min", Entrada:"$9.000", Edad:"+16" }, photos:[], videos:[] }
+];
+const DEFAULT_VISITA = [
+  {title:"Cómo llegar", text:"[Acá va el texto completo: dirección exacta, cómo llegar en auto y en transporte público, y dónde estacionar.]"},
+  {title:"Antes de ir", text:"[Acá van los horarios de apertura de puertas, cómo es el ingreso y las recomendaciones para el día del show.]"},
+  {title:"Accesibilidad", text:"[Acá va el detalle de accesos, servicios y recorridos para todos los espectadores.]"}
+];
+
+const STORAGE_KEY = "ao_admin_data_v1";
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ const s = JSON.parse(raw); if(s && s.events) return s; }
+  }catch{}
+  return { events: DEFAULT_EVENTS, visita: DEFAULT_VISITA };
+}
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE)); return true; }catch{ return false; } }
+let STATE = loadState();
+
+const today = iso(0);
+const isPast = e => e.date < today;
+const fmtLong = e => new Date(e.date+"T12:00").toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long",year:"numeric"}) + " · " + e.time + " h";
+const fmtCard = e => e.date.split("-").reverse().join("-") + " " + e.time + " hs";
+const byDate = (a,b) => (a.date+a.time).localeCompare(b.date+b.time);
+let view = new Date(); view.setDate(1);
+let hl = null;
+
+/* ============ SITIO PÚBLICO ============ */
+function card(e){
+  const past = isPast(e), first = e.photos[0];
+  const st = past ? "Realizado" : e.status;
+  return `<button class="card" type="button" data-id="${e.id}">
+    <div class="thumb">${first ? `<img src="${esc(first)}" alt="">` : "Foto"}${st ? `<span class="st ${past?"past":(e.status==="Agotado"?"off":"")}">${st}</span>` : ""}</div>
+    <div class="body"><h3>${esc(e.title)}</h3><p>${fmtCard(e)}</p></div></button>`;
+}
+function renderCards(){
+  const up = STATE.events.filter(e=>!isPast(e)).sort(byDate), ps = STATE.events.filter(isPast).sort((a,b)=>byDate(b,a));
+  $("upcoming").innerHTML = up.map(card).join("") || `<p class="sub">No hay eventos próximos por el momento.</p>`;
+  $("past").innerHTML = ps.map(card).join("") || `<p class="sub">Todavía no hay eventos realizados.</p>`;
+  document.querySelectorAll("#upcoming .card,#past .card").forEach(b => b.onclick = () => { const e = STATE.events.find(x=>x.id==b.dataset.id); openDay(e.date, e.id); });
+}
+function renderVisita(){
+  $("visitaCards").innerHTML = STATE.visita.map((v,i)=>`<button class="card" type="button" data-i="${i}">
+    <div class="thumb info-thumb">Imagen</div><div class="body"><h3>${esc(v.title)}</h3><p>Ver más</p></div></button>`).join("");
+  document.querySelectorAll("#visitaCards .card").forEach(b => b.onclick = () => {
+    const v = STATE.visita[b.dataset.i];
+    $("idlgBody").innerHTML = `<button class="close" type="button" id="ix" aria-label="Cerrar">&times;</button><h3>${esc(v.title)}</h3><p style="white-space:pre-wrap">${esc(v.text)}</p>`;
+    $("ix").onclick = () => $("idlg").close();
+    $("idlg").showModal();
+  });
+}
+function renderCal(){
+  const y = view.getFullYear(), m = view.getMonth();
+  $("title").textContent = view.toLocaleDateString("es-AR",{month:"long",year:"numeric"});
+  let h = ["L","M","M","J","V","S","D"].map(d=>`<div class="dow">${d}</div>`).join("");
+  const offset = (new Date(y,m,1).getDay()+6)%7, days = new Date(y,m+1,0).getDate();
+  for(let i=0;i<offset;i++) h += `<div class="day empty"></div>`;
+  for(let d=1; d<=days; d++){
+    const key = `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const evs = STATE.events.filter(e=>e.date===key);
+    const cls = ["day", key===today?"today":"", evs.length?"has":"plain", evs.length && key<today?"past":"", key===hl?"hl":""].join(" ");
+    const tags = evs.map(e=>`<span class="tag">${esc(e.title)}</span>`).join("");
+    h += evs.length
+      ? `<button class="${cls}" type="button" data-date="${key}" aria-label="${d}: ${evs.length} evento(s)"><span class="n">${d}</span>${tags}</button>`
+      : `<div class="${cls}"><span class="n">${d}</span></div>`;
+  }
+  $("grid").innerHTML = h;
+  $("grid").querySelectorAll("button.day").forEach(b => b.onclick = () => openDay(b.dataset.date));
+}
+function openDay(date, id){
+  const evs = STATE.events.filter(e=>e.date===date);
+  showEvent(evs, id ? evs.find(e=>e.id===id) : evs[0]);
+  if(!$("dlg").open) $("dlg").showModal();
+}
+function showEvent(evs, e){
+  const past = isPast(e);
+  const tabs = evs.length>1 ? `<div class="tabs">${evs.map(x=>`<button type="button" data-id="${x.id}" aria-pressed="${x.id===e.id}">${esc(x.title)}</button>`).join("")}</div>` : "";
+  const photos = `<h4>Fotos</h4><div class="photos">${e.photos.length ? e.photos.map((p,i)=>`<button type="button" data-photo="${i}"><img src="${esc(p)}" alt="${esc(e.title)} foto ${i+1}"></button>`).join("") : `<div class="ph">Sin fotos aún</div>`}</div>`;
+  const vids = past ? `<h4>Videos del evento</h4>${e.videos.length ? e.videos.map(v=>`<video controls src="${esc(v)}"></video>`).join("") : `<p class="note">Todavía no hay videos.</p>`}` : "";
+  const buy = (!past && e.ticketUrl) ? `<a class="buy" href="${esc(e.ticketUrl)}" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v1a2 2 0 0 0 0 4v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1a2 2 0 0 0 0-4z"/></svg>
+      Comprar entradas</a>` : "";
+  $("dlgBody").innerHTML = `<button class="close" type="button" id="x" aria-label="Cerrar">&times;</button>${tabs}
+    <span class="badge ${past?"past":""}">${past?"Evento realizado":"Próximo evento"} · ${esc(e.category)}</span>
+    <h3>${esc(e.title)}</h3><p class="when">${fmtLong(e)}</p>
+    <h4>Sinopsis</h4><p>${esc(e.synopsis)}</p>
+    <h4>Datos</h4><dl>${Object.entries(e.info).map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>
+    ${photos}${vids}${buy}`;
+  $("x").onclick = () => $("dlg").close();
+  $("dlgBody").querySelectorAll(".tabs button").forEach(b => b.onclick = () => showEvent(evs, evs.find(x=>x.id==b.dataset.id)));
+  $("dlgBody").querySelectorAll("[data-photo]").forEach(b => b.onclick = () => openLightbox(e.photos, +b.dataset.photo));
+}
+$("dlg").addEventListener("click", ev => { if(ev.target === $("dlg")) $("dlg").close(); });
+$("idlg").addEventListener("click", ev => { if(ev.target === $("idlg")) $("idlg").close(); });
+
+/* ---- Lightbox de fotos ---- */
+let lbPhotos = [], lbIndex = 0;
+function openLightbox(photos, i){
+  lbPhotos = photos; lbIndex = i; showLbImg();
+  if(!$("lightbox").open) $("lightbox").showModal();
+}
+function showLbImg(){
+  $("lb-img").src = lbPhotos[lbIndex];
+  const multi = lbPhotos.length > 1;
+  $("lb-prev").hidden = !multi; $("lb-next").hidden = !multi;
+  $("lb-count").hidden = !multi; $("lb-count").textContent = (lbIndex+1) + " / " + lbPhotos.length;
+}
+$("lb-close").onclick = () => $("lightbox").close();
+$("lb-prev").onclick = () => { lbIndex = (lbIndex - 1 + lbPhotos.length) % lbPhotos.length; showLbImg(); };
+$("lb-next").onclick = () => { lbIndex = (lbIndex + 1) % lbPhotos.length; showLbImg(); };
+$("lightbox").addEventListener("click", ev => { if(ev.target === $("lightbox")) $("lightbox").close(); });
+$("lightbox").addEventListener("keydown", ev => {
+  if(ev.key==="ArrowLeft") $("lb-prev").click();
+  else if(ev.key==="ArrowRight") $("lb-next").click();
+});
+
+const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+let found = [], act = -1;
+const q = $("q"), res = $("res");
+function closeRes(){ res.hidden = true; q.setAttribute("aria-expanded","false"); act = -1; }
+function renderRes(){
+  const t = norm(q.value.trim());
+  found = STATE.events.filter(e => !t || norm(e.title+" "+e.category+" "+e.synopsis).includes(t)).sort(byDate);
+  res.innerHTML = found.length
+    ? found.map((e,i)=>`<li role="option" data-i="${i}" aria-selected="${i===act}"><span>${esc(e.title)}</span><small>${new Date(e.date+"T12:00").toLocaleDateString("es-AR",{day:"numeric",month:"short",year:"numeric"})}${isPast(e)?" (realizado)":""}</small></li>`).join("")
+    : `<li class="none">No hay eventos que coincidan</li>`;
+  res.hidden = false; q.setAttribute("aria-expanded","true");
+}
+function pick(e){ hl = e.date; view = new Date(e.date+"T12:00"); view.setDate(1); q.value = e.title; closeRes(); renderCal(); $("calendario").scrollIntoView(); openDay(e.date, e.id); }
+q.addEventListener("input", () => { act = -1; renderRes(); });
+q.addEventListener("focus", renderRes);
+q.addEventListener("keydown", ev => {
+  if(ev.key==="ArrowDown"||ev.key==="ArrowUp"){ ev.preventDefault(); if(res.hidden) renderRes(); if(!found.length) return; act = (act + (ev.key==="ArrowDown"?1:-1) + found.length) % found.length; renderRes(); }
+  else if(ev.key==="Enter" && found[act]){ ev.preventDefault(); pick(found[act]); }
+  else if(ev.key==="Escape") closeRes();
+});
+res.addEventListener("mousedown", ev => { const li = ev.target.closest("li[data-i]"); if(li){ ev.preventDefault(); pick(found[li.dataset.i]); } });
+document.addEventListener("click", ev => { if(!ev.target.closest(".search")) closeRes(); });
+$("hsearch").onclick = () => { $("inicio").scrollIntoView(); setTimeout(() => q.focus(), 300); };
+$("prev").onclick = () => { view.setMonth(view.getMonth()-1); renderCal(); };
+$("nxt").onclick = () => { view.setMonth(view.getMonth()+1); renderCal(); };
+
+function renderPublic(){ renderCards(); renderCal(); renderVisita(); }
+renderPublic();
+
+/* ============ PANEL DE ADMINISTRACIÓN ============ */
+function resizeImage(file, maxW){
+  return new Promise((resolve, reject) => {
+    const img = new Image(), r = new FileReader();
+    r.onload = () => { img.onload = () => {
+      const scale = Math.min(1, maxW / img.width);
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width*scale); c.height = Math.round(img.height*scale);
+      c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+      resolve(c.toDataURL("image/jpeg", .82));
+    }; img.onerror = reject; img.src = r.result; };
+    r.onerror = reject; r.readAsDataURL(file);
+  });
+}
+function blankEvent(){ return {id:uid(), title:"", date:iso(1), time:"20:00", category:"", status:"Disponible", synopsis:"", info:{Lugar:"Sala principal",Duración:"",Entrada:"",Edad:""}, photos:[], videos:[]}; }
+
+function setSaveMsg(m){ $("a-save-state").textContent = m || ""; }
+function commit(msg){ const ok = saveState(); renderPublic(); setSaveMsg(ok ? (msg||"Guardado en este navegador.") : "No se pudo guardar: el navegador rechazó el almacenamiento local."); }
+
+function renderList(){
+  const rows = [...STATE.events].sort(byDate).map(e => `
+    <div class="arow">
+      <div><div class="ttl">${esc(e.title)||"(sin título)"}</div><div class="sm">${e.date} · ${e.time} · ${isPast(e)?"realizado":"próximo"}</div></div>
+      <div style="display:flex;gap:6px">
+        <button class="iconbtn" type="button" data-edit="${e.id}">Editar</button>
+        <button class="iconbtn danger" type="button" data-del="${e.id}">Eliminar</button>
+      </div>
+    </div>`).join("");
+  $("a-list").innerHTML = rows || `<p class="sub">Todavía no hay eventos.</p>`;
+  document.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => openForm(STATE.events.find(x=>x.id===b.dataset.edit)));
+  document.querySelectorAll("[data-del]").forEach(b => b.onclick = () => {
+    if(!confirm("¿Eliminar este evento? No se puede deshacer.")) return;
+    STATE.events = STATE.events.filter(x=>x.id!==b.dataset.del);
+    commit("Evento eliminado."); renderList(); closeForm();
+  });
+}
+function closeForm(){ $("a-form-slot").innerHTML = ""; }
+function openForm(ev){
+  const editingExisting = STATE.events.some(x=>x.id===ev.id);
+  $("a-form-slot").innerHTML = `
+    <div class="aform">
+      <h3 class="full" style="margin:0">${editingExisting?"Editar evento":"Nuevo evento"}</h3>
+      <div class="full"><label>Título</label><input id="f-title" value="${esc(ev.title)}"></div>
+      <div><label>Fecha</label><input id="f-date" type="date" value="${ev.date}"></div>
+      <div><label>Hora</label><input id="f-time" type="time" value="${ev.time}"></div>
+      <div><label>Categoría</label><input id="f-cat" value="${esc(ev.category)}" placeholder="Música, Teatro, Charla..."></div>
+      <div><label>Estado de entradas</label>
+        <select id="f-status">
+          <option${ev.status==="Disponible"?" selected":""}>Disponible</option>
+          <option${ev.status==="Últimas entradas"?" selected":""}>Últimas entradas</option>
+          <option${ev.status==="Agotado"?" selected":""}>Agotado</option>
+        </select></div>
+      <div class="full"><label>Sinopsis</label><textarea id="f-syn" rows="3">${esc(ev.synopsis)}</textarea></div>
+      <div><label>Lugar</label><input id="f-lugar" value="${esc(ev.info.Lugar||"")}"></div>
+      <div><label>Duración</label><input id="f-dur" value="${esc(ev.info.Duración||"")}"></div>
+      <div><label>Entrada</label><input id="f-ent" value="${esc(ev.info.Entrada||"")}"></div>
+      <div><label>Edad</label><input id="f-edad" value="${esc(ev.info.Edad||"")}"></div>
+      <div class="full"><label>Link para comprar entradas (Passline u otro)</label><input id="f-ticket" type="url" value="${esc(ev.ticketUrl||"")}" placeholder="https://www.passline.com/evento/..."></div>
+
+      <div class="full"><label>Fotos</label>
+        <div class="cards" id="f-photos" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr));margin-bottom:8px"></div>
+        <input id="f-addphoto" type="file" accept="image/*">
+        <p class="note">Se guardan en este navegador, comprimidas. Para muchas fotos de alta calidad, mejor un backend con almacenamiento real.</p>
+      </div>
+
+      <div class="full"><label>Videos ${isPast(ev)?"":"(se cargan cuando el evento ya pasó)"}</label>
+        ${isPast(ev) ? `
+        <div id="f-videos" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
+        <input id="f-addvideourl" placeholder="Pegar URL de un video ya subido (YouTube, Vimeo, o archivo .mp4)">
+        <p class="note" style="margin-bottom:8px">Recomendado: subí el video a YouTube/Vimeo (aunque sea no listado) y pegá el link acá — así no depende de este navegador.</p>
+        <input id="f-addvideofile" type="file" accept="video/*">
+        <p class="note">Alternativa rápida: elegir un archivo de video acá lo muestra solo en esta sesión (no queda guardado al recargar).</p>
+        ` : `<p class="note">Guardá el evento con una fecha pasada para poder subir fotos y videos del show.</p>`}
+      </div>
+
+      <div class="full aactions">
+        <button class="btn primary" type="button" id="f-save">Guardar evento</button>
+        <button class="btn" type="button" id="f-cancel">Cancelar</button>
+      </div>
+    </div>`;
+
+  function renderPhotos(){
+    $("f-photos").innerHTML = ev.photos.map((p,i)=>`<div class="thumbmini"><img src="${esc(p)}"><button class="iconbtn danger" type="button" data-rmphoto="${i}">×</button></div>`).join("") || `<p class="sub" style="margin:0">Sin fotos.</p>`;
+    document.querySelectorAll("[data-rmphoto]").forEach(b => b.onclick = () => { ev.photos.splice(+b.dataset.rmphoto,1); renderPhotos(); });
+  }
+  function renderVideos(){
+    const box = $("f-videos"); if(!box) return;
+    box.innerHTML = ev.videos.map((v,i)=>`<div style="display:flex;align-items:center;gap:8px"><video controls src="${esc(v)}" style="max-width:200px;border-radius:6px"></video><button class="iconbtn danger" type="button" data-rmvideo="${i}">Quitar</button></div>`).join("") || `<p class="sub" style="margin:0">Sin videos.</p>`;
+    document.querySelectorAll("[data-rmvideo]").forEach(b => b.onclick = () => { ev.videos.splice(+b.dataset.rmvideo,1); renderVideos(); });
+  }
+  renderPhotos(); renderVideos();
+
+  $("f-addphoto").onchange = async () => {
+    const f = $("f-addphoto").files[0]; if(!f) return;
+    try{ ev.photos.push(await resizeImage(f, 1000)); renderPhotos(); $("f-addphoto").value=""; }
+    catch{ alert("No se pudo procesar la imagen."); }
+  };
+  const avu = $("f-addvideourl");
+  if(avu) avu.addEventListener("keydown", e => { if(e.key==="Enter" && avu.value.trim()){ ev.videos.push(avu.value.trim()); avu.value=""; renderVideos(); } });
+  const avf = $("f-addvideofile");
+  if(avf) avf.onchange = () => { const f = avf.files[0]; if(!f) return; ev.videos.push(URL.createObjectURL(f)); avf.value=""; renderVideos(); };
+
+  $("f-cancel").onclick = closeForm;
+  $("f-save").onclick = () => {
+    ev.title = $("f-title").value.trim(); ev.date = $("f-date").value; ev.time = $("f-time").value; ev.category = $("f-cat").value.trim();
+    ev.status = $("f-status").value; ev.synopsis = $("f-syn").value.trim();
+    ev.info = {Lugar:$("f-lugar").value.trim(), Duración:$("f-dur").value.trim(), Entrada:$("f-ent").value.trim(), Edad:$("f-edad").value.trim()};
+    ev.ticketUrl = $("f-ticket").value.trim();
+    if(!ev.title || !ev.date){ setSaveMsg("Completá al menos título y fecha."); return; }
+    if(!editingExisting) STATE.events.push(ev);
+    commit("Evento guardado."); renderList(); closeForm();
+  };
+}
+$("a-new").onclick = () => openForm(blankEvent());
+
+function renderVisitaForm(){
+  $("a-visita-form").innerHTML = STATE.visita.map((v,i)=>`
+    <div class="aform">
+      <div class="full"><label>Título</label><input data-vi="${i}" data-f="title" value="${esc(v.title)}"></div>
+      <div class="full"><label>Texto</label><textarea data-vi="${i}" data-f="text" rows="3">${esc(v.text)}</textarea></div>
+    </div>`).join("");
+}
+$("a-visita-save").onclick = () => {
+  document.querySelectorAll("#a-visita-form [data-vi]").forEach(el => { STATE.visita[+el.dataset.vi][el.dataset.f] = el.value; });
+  commit("Visita guardada."); renderVisitaForm();
+};
+
+function renderExport(){ $("a-export").value = JSON.stringify(STATE, null, 2); }
+$("a-copy").onclick = async () => {
+  try{ await navigator.clipboard.writeText($("a-export").value); setSaveMsg("Copiado al portapapeles."); }
+  catch{ $("a-export").select(); setSaveMsg("Seleccioná y copiá manualmente (Ctrl/Cmd+C)."); }
+};
+$("a-import-btn").onclick = () => {
+  const msg = $("a-import-msg");
+  let parsed;
+  try{ parsed = JSON.parse($("a-import").value); }
+  catch{ msg.className = "import-msg err"; msg.textContent = "Eso no es un JSON válido. Revisá que hayas pegado todo, sin cortar."; return; }
+  if(!parsed || !Array.isArray(parsed.events) || !Array.isArray(parsed.visita)){
+    msg.className = "import-msg err"; msg.textContent = "El JSON no tiene el formato esperado (falta 'events' o 'visita')."; return;
+  }
+  STATE = parsed;
+  const ok = saveState();
+  renderPublic(); renderList(); renderVisitaForm(); renderExport();
+  msg.className = "import-msg " + (ok ? "ok" : "err");
+  msg.textContent = ok ? `Importado: ${STATE.events.length} eventos y ${STATE.visita.length} textos de visita.` : "Se importó en memoria pero no se pudo guardar en este navegador.";
+  $("a-import").value = "";
+};
+
+document.querySelectorAll(".a-tabs button").forEach(b => b.onclick = () => {
+  document.querySelectorAll(".a-tabs button").forEach(x=>x.classList.remove("on"));
+  document.querySelectorAll(".a-panel").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on"); $("tab-"+b.dataset.tab).classList.add("on");
+  if(b.dataset.tab==="vi") renderVisitaForm();
+  if(b.dataset.tab==="ex") renderExport();
+});
+
+/* ---- Acceso: ruta oculta + contraseña ---- */
+function inAdminRoute(){ return location.hash.replace("#","") === ADMIN_ROUTE; }
+function showAdmin(){
+  $("site").classList.add("hidden"); $("admin").classList.add("open");
+  const already = sessionStorage.getItem("ao_admin_ok") === "1";
+  $("a-gate").style.display = already ? "none" : "";
+  $("a-panel-wrap").style.display = already ? "" : "none";
+  if(already){ renderList(); renderVisitaForm(); }
+}
+function hideAdmin(){ $("site").classList.remove("hidden"); $("admin").classList.remove("open"); }
+function routeCheck(){ if(inAdminRoute()) showAdmin(); else hideAdmin(); }
+window.addEventListener("hashchange", routeCheck);
+routeCheck();
+
+$("a-enter").onclick = () => {
+  if($("a-pass").value === ADMIN_PASSWORD){
+    sessionStorage.setItem("ao_admin_ok","1");
+    $("a-gate").style.display = "none"; $("a-panel-wrap").style.display = "";
+    renderList(); renderVisitaForm();
+  } else { $("a-err").textContent = "Contraseña incorrecta."; }
+};
+$("a-pass").addEventListener("keydown", e => { if(e.key==="Enter") $("a-enter").click(); });
+$("a-logout").onclick = () => { sessionStorage.removeItem("ao_admin_ok"); location.hash = "inicio"; };
+</script>
+</body>
+</html>
