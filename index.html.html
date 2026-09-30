@@ -29,9 +29,10 @@ section h2{margin:0 0 4px;font-size:1.5rem}
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);border-bottom:1px solid var(--border)}
 header .wrap{display:flex;align-items:center;gap:16px;height:64px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.0625rem}
-.logo-mark{width:38px;height:38px;flex:none;display:block}
+.logo-mark{width:38px;height:38px;flex:none;display:block;object-fit:contain;border-radius:8px}
 .logo-mark polygon{fill:#000;stroke:var(--accent);stroke-width:3;stroke-linejoin:miter}
 .logo-mark text{fill:var(--accent-2);font-family:var(--font);font-size:17px;font-weight:900}
+.gatebox .logo-mark{margin:0 auto 12px}
 nav{display:flex;gap:18px;margin-left:12px}
 nav a{color:var(--muted);font-size:.9375rem;font-weight:600;text-transform:uppercase;letter-spacing:.03em} nav a:hover{color:var(--accent-2)}
 .actions{margin-left:auto;display:flex;gap:8px}
@@ -287,7 +288,7 @@ video{width:100%;border-radius:6px;background:#000;margin-bottom:8px}
 <div id="admin">
   <div class="gatewrap" id="a-gate">
     <div class="gatebox">
-      <svg class="logo-mark" viewBox="0 0 40 40" style="margin:0 auto 12px" aria-hidden="true">
+      <svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true">
         <polygon points="20,2 25,2 25,7 30,7 30,12 35,12 35,20 35,25 30,25 30,30 25,30 25,35 20,35 15,35 15,30 10,30 10,25 5,25 5,20 5,12 10,12 10,7 15,7 15,2"/>
         <text x="20" y="19" text-anchor="middle" dominant-baseline="central">A</text>
       </svg>
@@ -323,6 +324,13 @@ video{width:100%;border-radius:6px;background:#000;margin-bottom:8px}
       </div>
 
       <div class="a-panel" id="tab-vi">
+        <div class="aform">
+          <div class="full"><label>Logo del sitio</label>
+            <div class="thumbmini" style="max-width:120px;margin-bottom:8px" id="logo-thumb"></div>
+            <input type="file" accept="image/*" id="logo-file">
+            <p class="note" id="logo-status">Se muestra en el header y en la pantalla de acceso al panel. Se actualiza al instante, no hace falta tocar "Guardar visita".</p>
+          </div>
+        </div>
         <p class="sub">Este texto es el que ve el público al tocar cada tarjeta de "Planificá tu visita".</p>
         <div id="a-visita-form"></div>
         <div class="aactions"><button class="btn primary" type="button" id="a-visita-save">Guardar visita</button></div>
@@ -368,12 +376,13 @@ function eventToRow(e){
   };
 }
 
-let STATE = { events: [], visita: [] };
+let STATE = { events: [], visita: [], settings: { logoUrl: "" } };
 function fmtErr(err){ return err ? (err.message || err.error_description || err.details || JSON.stringify(err)) : ""; }
 async function loadAll(){
-  const [{data:evRows,error:e1},{data:viRows,error:e2}] = await Promise.all([
+  const [{data:evRows,error:e1},{data:viRows,error:e2},{data:ssRows,error:e3}] = await Promise.all([
     sb.from("events").select("*"),
-    sb.from("visita_info").select("*").order("id")
+    sb.from("visita_info").select("*").order("id"),
+    sb.from("site_settings").select("*").eq("id",1)
   ]);
   if(e1 || e2){
     const msg = "No se pudo conectar con la base de datos. " + (fmtErr(e1) || fmtErr(e2));
@@ -384,6 +393,17 @@ async function loadAll(){
   }
   STATE.events = (evRows||[]).map(rowToEvent);
   STATE.visita = (viRows||[]).map(r => ({id:r.id, title:r.title, text:r.text, image:r.image_url||""}));
+  if(e3) console.error("Error cargando configuración:", e3);
+  STATE.settings.logoUrl = (ssRows && ssRows[0] && ssRows[0].logo_url) || "";
+}
+function applyLogo(){
+  if(!STATE.settings.logoUrl) return;
+  document.querySelectorAll(".logo-mark").forEach(el => {
+    if(el.tagName === "IMG") { el.src = STATE.settings.logoUrl; return; }
+    const img = document.createElement("img");
+    img.className = "logo-mark"; img.alt = "Auditorio Oeste"; img.src = STATE.settings.logoUrl;
+    el.replaceWith(img);
+  });
 }
 
 const today = iso(0);
@@ -688,6 +708,26 @@ function renderViThumb(i){
     : `<div class="ph" style="aspect-ratio:4/3">Sin imagen</div>`;
   if(v.image) $(`vi-rm-${i}`).onclick = () => { STATE.visita[i].image = ""; renderViThumb(i); };
 }
+function renderLogoThumb(){
+  $("logo-thumb").innerHTML = STATE.settings.logoUrl
+    ? `<img src="${esc(STATE.settings.logoUrl)}">`
+    : `<div class="ph" style="aspect-ratio:1/1">Sin logo</div>`;
+}
+$("logo-file").onchange = async () => {
+  const f = $("logo-file").files[0]; if(!f) return;
+  const status = $("logo-status"); const prev = status.textContent;
+  status.innerHTML = `<span class="spin"></span> Subiendo logo...`;
+  try{
+    const blob = await resizeImageBlob(f, 400);
+    const url = await uploadToBucket("photos", f, blob);
+    const { error } = await sb.from("site_settings").update({logo_url:url}).eq("id",1);
+    if(error) throw error;
+    STATE.settings.logoUrl = url;
+    renderLogoThumb(); applyLogo();
+    status.textContent = "Logo actualizado en todo el sitio.";
+  }catch(err){ status.textContent = "No se pudo subir: " + err.message; }
+  setTimeout(()=>{ if(status) status.textContent = prev; }, 3000);
+};
 function renderVisitaForm(){
   $("a-visita-form").innerHTML = STATE.visita.map((v,i)=>`
     <div class="aform">
@@ -738,7 +778,7 @@ document.querySelectorAll(".a-tabs button").forEach(b => b.onclick = () => {
   document.querySelectorAll(".a-tabs button").forEach(x=>x.classList.remove("on"));
   document.querySelectorAll(".a-panel").forEach(x=>x.classList.remove("on"));
   b.classList.add("on"); $("tab-"+b.dataset.tab).classList.add("on");
-  if(b.dataset.tab==="vi") renderVisitaForm();
+  if(b.dataset.tab==="vi"){ renderVisitaForm(); renderLogoThumb(); }
   if(b.dataset.tab==="ex") renderExport();
 });
 
@@ -770,6 +810,7 @@ $("a-logout").onclick = async () => { await sb.auth.signOut(); location.hash = "
 (async function boot(){
   await loadAll();
   renderPublic();
+  applyLogo();
   await routeCheck();
 })();
 </script>
